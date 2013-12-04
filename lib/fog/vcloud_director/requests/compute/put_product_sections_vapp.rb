@@ -7,7 +7,25 @@ module Fog
         # @param [String] id Object identifier of the vApp or VM.
         # @return [Excon::Response]
         #   * body<~Hash>:
-        def put_product_sections_vapp(id, body)
+        def put_product_sections_vapp(id, prop_list)
+          body = Nokogiri::XML::Builder.new do
+            attrs = {
+              :xmlns => 'http://www.vmware.com/vcloud/v1.5',
+              'xmlns:ovf' => 'http://schemas.dmtf.org/ovf/envelope/1'
+            }
+            ProductSectionList(attrs) {
+              self[:ovf].ProductSection({"required" => "true"}) {
+                self[:ovf].Info "Information about the installed software"
+                for item in prop_list
+                  ns_attr = {}
+                  for key in item.keys
+                    ns_attr["ovf:"+key] = item[key]
+                  end
+                  self[:ovf].Property(ns_attr)
+                end
+              }
+            }
+          end.to_xml
           request(
             :expects => 202,
             :method     => 'PUT',
