@@ -8,8 +8,6 @@ module Fog
         # @param [String] xml document to supply.
         # @return [Excon::Response]
         def put_vm_hardware_section(id, body)
-
-          Fog::Logger.warning("put_virtual_hardware_section: " + body)
           request(
             :expects => 202,
             :method     => 'PUT',
